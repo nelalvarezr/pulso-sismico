@@ -17,6 +17,8 @@ interface EarthquakeMapProps {
   height?: number;
   interactive?: boolean;
   showDetailLink?: boolean;
+  focusZoom?: number;
+  showPopup?: boolean;
 }
 
 type ReactLeafletModule = typeof import("react-leaflet");
@@ -25,6 +27,7 @@ type LeafletModule = typeof import("leaflet");
 interface FitBoundsProps {
   earthquakes: Earthquake[];
   focusId?: string;
+  focusZoom: number;
   useMapHook: ReactLeafletModule["useMap"];
 }
 
@@ -36,22 +39,35 @@ function MapLoadingState({ height }: { height: number }) {
   );
 }
 
-function FitBounds({ earthquakes, focusId, useMapHook }: FitBoundsProps) {
+function FitBounds({
+  earthquakes,
+  focusId,
+  focusZoom,
+  useMapHook,
+}: FitBoundsProps) {
   const map = useMapHook();
 
   useEffect(() => {
     if (earthquakes.length === 0) return;
 
-    const focused = focusId ? earthquakes.find((item) => item.id === focusId) : null;
+    const focused = focusId
+      ? earthquakes.find((item) => item.id === focusId)
+      : null;
 
     if (focused) {
-      map.setView([focused.latitude, focused.longitude], 5);
+      map.setView(
+        [focused.latitude, focused.longitude],
+        focusZoom
+      );
       return;
     }
 
-    const bounds = earthquakes.map((item) => [item.latitude, item.longitude]) as [number, number][];
+    const bounds = earthquakes.map(
+      (item) => [item.latitude, item.longitude]
+    ) as [number, number][];
+
     map.fitBounds(bounds, { padding: [32, 32] });
-  }, [earthquakes, focusId, map]);
+  }, [earthquakes, focusId, focusZoom, map]);
 
   return null;
 }
@@ -62,6 +78,8 @@ export function EarthquakeMap({
   height = 560,
   interactive = true,
   showDetailLink = true,
+  focusZoom = 5,
+  showPopup = true,
 }: EarthquakeMapProps) {
   const [modules, setModules] = useState<{
     reactLeaflet: ReactLeafletModule;
@@ -129,13 +147,20 @@ export function EarthquakeMap({
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
-        <FitBounds earthquakes={earthquakes} focusId={focusEarthquakeId} useMapHook={useMap} />
+        <FitBounds
+          earthquakes={earthquakes}
+          focusId={focusEarthquakeId}
+          focusZoom={focusZoom}
+          useMapHook={useMap}
+        />
 
         {earthquakes.map((earthquake) => (
           <Marker icon={createMagnitudeIcon(earthquake.magnitude)} key={earthquake.id} position={[earthquake.latitude, earthquake.longitude]}>
-            <Popup closeButton={false} minWidth={270}>
-              <MapEventPopup earthquake={earthquake} />
-            </Popup>
+             {showPopup ? (
+              <Popup closeButton={false} minWidth={270}>
+                <MapEventPopup earthquake={earthquake} />
+              </Popup>
+            ) : null}
           </Marker>
         ))}
       </MapContainer>

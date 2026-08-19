@@ -10,17 +10,26 @@ export const footerLinks = [
 
 export const homeLearnCards = [
   {
-    description: "Cómo se relacionan la energía del evento y los efectos que se sienten en distintos lugares.",
+    description:
+      "Qué representa la magnitud de un sismo, cómo funciona su escala y por qué pequeños cambios significan grandes diferencias.",
+    href: "/aprende/magnitud",
+    title: "Magnitud",
+  },
+  {
+    description:
+      "Cómo se relacionan la energía del evento y los efectos que se sienten en distintos lugares.",
     href: "/aprende/magnitud-vs-intensidad",
     title: "Magnitud e intensidad",
   },
   {
-    description: "Qué es la profundidad hipocentral y por qué influye en la percepción de un sismo.",
+    description:
+      "Qué es la profundidad hipocentral y por qué influye en la percepción de un sismo.",
     href: "/aprende/profundidad",
     title: "Profundidad",
   },
   {
-    description: "Una línea de tiempo con eventos ampliamente documentados que marcaron la historia sísmica del país.",
+    description:
+      "Una línea de tiempo con eventos ampliamente documentados que marcaron la historia sísmica del país.",
     href: "/aprende/historia-sismica-chile",
     title: "Historia sísmica de Chile",
   },

@@ -49,6 +49,8 @@ export function LatestEarthquakeCard({ earthquake }: LatestEarthquakeCardProps) 
             height={240}
             interactive={false}
             showDetailLink={false}
+            focusZoom={6}
+            showPopup={false}
           />
         </div>
       </div>

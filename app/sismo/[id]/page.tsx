@@ -80,6 +80,7 @@ export default async function EarthquakeDetailPage({ params }: DetailPageProps) 
         className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#55C2FF]/25 bg-[#55C2FF]/8 px-3.5 py-1 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/15"
         href="/"
       >
+        <span>←</span>
         <span>Volver</span>
       </Link>
 
@@ -114,7 +115,13 @@ export default async function EarthquakeDetailPage({ params }: DetailPageProps) 
       <section className="grid gap-6 lg:grid-cols-[minmax(0,1.3fr)_320px]">
         <div className="space-y-4">
           <h2 className="text-2xl font-extrabold text-[#F7FAFC]">Epicentro</h2>
-          <MapShell earthquakes={[earthquake]} focusEarthquakeId={earthquake.id} height={360} interactive={true} />
+          <MapShell
+            earthquakes={[earthquake]}
+            focusEarthquakeId={earthquake.id}
+            height={360}
+            interactive={true}
+            focusZoom={6}
+            showPopup={false} />
         </div>
 
         <section className="overflow-hidden rounded-[28px] border border-[var(--border-subtle)] bg-[var(--surface)] shadow-[0_24px_60px_rgba(0,0,0,0.24)]">

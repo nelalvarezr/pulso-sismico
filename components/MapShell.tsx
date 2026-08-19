@@ -18,6 +18,8 @@ interface MapShellProps {
   focusEarthquakeId?: string;
   height?: number;
   interactive?: boolean;
+  focusZoom?: number;
+  showPopup?: boolean;
 }
 
 export function MapShell(props: MapShellProps) {

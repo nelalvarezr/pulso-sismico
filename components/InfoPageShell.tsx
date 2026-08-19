@@ -11,7 +11,8 @@ interface InfoPageShellProps {
 export function InfoPageShell({ children, description, eyebrow = "PULSO SÍSMICO", title }: InfoPageShellProps) {
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-8 px-4 py-8 md:px-6">
-      <Link className="inline-flex items-center gap-2 text-sm font-semibold text-[#F7FAFC]" href="/">
+      <Link className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#55C2FF]/25 bg-[#55C2FF]/8 px-3.5 py-1 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/15"
+        href="/">
         <span>←</span>
         <span>Volver al inicio</span>
       </Link>
