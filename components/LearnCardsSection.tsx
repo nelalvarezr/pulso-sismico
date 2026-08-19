@@ -14,22 +14,42 @@ export function LearnCardsSection() {
       </div>
 
       <div className="grid gap-5 md:grid-cols-2">
-        {homeLearnCards.map((card) => (
-          <article
-            className="rounded-[24px] border border-[var(--border-subtle)] bg-[var(--surface)] p-5 shadow-[0_20px_50px_rgba(0,0,0,0.20)]"
-            key={card.href}
-          >
-            <h3 className="text-xl font-extrabold text-[#F7FAFC]">{card.title}</h3>
-            <p className="mt-3 text-sm leading-7 text-[#93A4B8]">{card.description}</p>
-            <Link
-              className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#55C2FF] transition hover:opacity-90"
-              href={card.href}
-            >
-              Leer más <span aria-hidden>→</span>
-            </Link>
-          </article>
-        ))}
-      </div>
+  {homeLearnCards.map((card) => {
+    const isHistory = card.href === "/aprende/historia-sismica-chile";
+
+    return (
+      <article
+        className={`rounded-3xl border p-5 shadow-[0_20px_50px_rgba(0,0,0,0.20)] transition ${
+          isHistory
+            ? "border-[#55C2FF]/30 bg-[#55C2FF]/5 hover:border-[#55C2FF]/45"
+            : "border-[var(--border-subtle)] bg-[var(--surface)] hover:border-[#55C2FF]/20"
+        }`}
+        key={card.href}
+      >
+        {isHistory && (
+          <span className="mb-3 inline-flex rounded-full border border-[#55C2FF]/25 bg-[#55C2FF]/10 px-2.5 py-1 text-[10px] font-bold tracking-[0.14em] text-[#55C2FF]">
+            HISTORIA DE CHILE
+          </span>
+        )}
+
+        <h3 className="text-xl font-extrabold text-[#F7FAFC]">
+          {card.title}
+        </h3>
+
+        <p className="mt-3 text-sm leading-7 text-[#93A4B8]">
+          {card.description}
+        </p>
+
+        <Link
+          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#55C2FF] transition hover:opacity-90"
+          href={card.href}
+        >
+          Leer más <span aria-hidden>→</span>
+        </Link>
+      </article>
+    );
+  })}
+</div>
     </section>
   );
 }
