@@ -25,6 +25,14 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   openGraph: {
     description: SITE_DESCRIPTION,
+    images: [
+      {
+        alt: "Pulso Sísmico — Últimos sismos en Chile",
+        height: 630,
+        url: "/opengraph-image",
+        width: 1200,
+      },
+    ],
     siteName: SITE_NAME,
     title: `${SITE_NAME} | Últimos sismos de Chile`,
     type: "website",
@@ -33,6 +41,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     description: SITE_DESCRIPTION,
+    images: ["/twitter-image"],
     title: `${SITE_NAME} | Últimos sismos de Chile`,
   },
 };

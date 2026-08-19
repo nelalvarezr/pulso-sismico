@@ -18,9 +18,9 @@ export function LatestEarthquakeCard({ earthquake }: LatestEarthquakeCardProps) 
           <div>
             <p className="mb-3 text-xs font-bold tracking-[0.24em] text-[#93A4B8]">ÚLTIMO SISMO</p>
             <div className="flex items-start gap-4">
-              <MagnitudeBadge magnitude={earthquake.magnitude} size="md" />
+              <MagnitudeBadge magnitude={earthquake.magnitude} size="sm" />
               <div className="min-w-0 flex-1">
-                <h2 className="text-3xl font-extrabold leading-tight text-[#F7FAFC]">{earthquake.place}</h2>
+                <h2 className="text-[20px] font-extrabold leading-tight text-[#F7FAFC]">{earthquake.place}</h2>
                 <div className="mt-4 flex flex-col gap-2 text-sm text-[#93A4B8]">
                   <p className="flex items-center gap-2">
                     <span>🕒</span>
@@ -31,23 +31,23 @@ export function LatestEarthquakeCard({ earthquake }: LatestEarthquakeCardProps) 
                     <span>Profundidad {earthquake.depthKm} km</span>
                   </p>
                 </div>
+                <Link
+                  className="mt-5 inline-flex w-fit rounded-full border border-[#55C2FF]/30 bg-[#55C2FF]/12 px-4 py-2 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/18"
+                  href={`/sismo/${earthquake.id}`}
+                >
+                  Ver detalle
+                </Link>
               </div>
             </div>
           </div>
-          <Link
-            className="mt-5 inline-flex w-fit rounded-full border border-[#55C2FF]/30 bg-[#55C2FF]/12 px-4 py-2 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/18"
-            href={`/sismo/${earthquake.id}`}
-          >
-            Ver detalle
-          </Link>
         </div>
 
-        <div className="min-w-0 overflow-hidden rounded-[24px]">
+        <div className="min-w-0 overflow-hidden rounded-3xl">
           <EarthquakeMap
             earthquakes={[earthquake]}
             focusEarthquakeId={earthquake.id}
             height={240}
-            interactive={true}
+            interactive={false}
             showDetailLink={false}
           />
         </div>

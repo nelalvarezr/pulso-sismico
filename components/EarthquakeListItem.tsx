@@ -12,20 +12,30 @@ interface EarthquakeListItemProps {
 export function EarthquakeListItem({ earthquake }: EarthquakeListItemProps) {
   return (
     <li>
-      <Link
-        className="flex items-center gap-4 rounded-[22px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-4 py-4 transition hover:border-[#55C2FF]/25 hover:bg-[#223B5D]"
-        href={`/sismo/${earthquake.id}`}
-      >
-        <MagnitudeBadge magnitude={earthquake.magnitude} size="sm" />
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-1xl font-bold text-[#F7FAFC]">{earthquake.place}</p>
-          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-[#93A4B8]">
-            <span className="flex items-center gap-1">🕒 {formatRelativeEarthquakeTime(earthquake)}</span>
-            <span className="flex items-center gap-1">📏 Profundidad {earthquake.depthKm} km</span>
-          </div>
-        </div>
-        <span className="text-2xl text-[#93A4B8]">›</span>
-      </Link>
-    </li>
+  <Link
+    className="flex items-center gap-3 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-4 py-3 transition hover:border-[#55C2FF]/25 hover:bg-[#223B5D]"
+    href={`/sismo/${earthquake.id}`}
+  >
+    <MagnitudeBadge magnitude={earthquake.magnitude} size="xs" />
+
+    <div className="min-w-0 flex-1">
+      <p className="truncate text-[13px] font-bold text-[#F7FAFC]">
+        {earthquake.place}
+      </p>
+
+      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-[#93A4B8]">
+        <span className="flex items-center gap-1">
+          🕒 {formatRelativeEarthquakeTime(earthquake)}
+        </span>
+
+        <span className="flex items-center gap-1">
+          📏 {earthquake.depthKm} km
+        </span>
+      </div>
+    </div>
+
+    <span className="text-xl text-[#93A4B8]">›</span>
+  </Link>
+</li>
   );
 }

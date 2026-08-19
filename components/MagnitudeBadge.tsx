@@ -4,17 +4,19 @@ import { getMagnitudeColor, getMagnitudeGradient } from "@/lib/utils/magnitude";
 
 interface MagnitudeBadgeProps {
   magnitude: number;
-  size?: "lg" | "md" | "sm";
+  size?: "lg" | "md" | "sm" | "xs";
 }
 
 export function MagnitudeBadge({ magnitude, size = "md" }: MagnitudeBadgeProps) {
   const [from, to] = getMagnitudeGradient(magnitude);
   const accent = getMagnitudeColor(magnitude);
   const sizeClass =
-    size === "lg"
-      ? "h-22 w-22 text-4xl font-extrabold sm:h-24 sm:w-24 sm:text-[2.6rem]"
-      : size === "sm"
-        ? "h-12 w-12 text-xl font-extrabold"
+  size === "lg"
+    ? "h-22 w-22 text-4xl font-extrabold sm:h-24 sm:w-24 sm:text-[2.6rem]"
+    : size === "sm"
+      ? "h-12 w-12 text-xl font-extrabold"
+      : size === "xs"
+        ? "h-10 w-10 text-sm font-extrabold"
         : "h-13 w-13 text-[1.45rem] font-extrabold";
 
   return (

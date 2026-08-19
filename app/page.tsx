@@ -16,6 +16,14 @@ export const metadata: Metadata = {
   description: SITE_DESCRIPTION,
   openGraph: {
     description: SITE_DESCRIPTION,
+    images: [
+      {
+        alt: "Pulso Sísmico — Últimos sismos en Chile",
+        height: 630,
+        url: "/opengraph-image",
+        width: 1200,
+      },
+    ],
     siteName: SITE_NAME,
     title: SITE_NAME,
     type: "website",
@@ -25,6 +33,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     description: SITE_DESCRIPTION,
+    images: ["/twitter-image"],
     title: `${SITE_NAME} | Últimos sismos de Chile`,
   },
 };
@@ -61,11 +70,21 @@ export default async function HomePage() {
       <Header updatedAt={updatedAt} />
       <LatestEarthquakeCard earthquake={latest} />
 
-      <section className="grid w-full gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] lg:items-start">
-        <EarthquakeList earthquakes={recent.length > 0 ? recent : [latest]} />
-        <div className="flex min-w-0 flex-col gap-4">
-          <h2 className="text-2xl font-extrabold text-[#F7FAFC]">Mapa de sismos recientes</h2>
-          <MapShell earthquakes={earthquakes} height={700} />
+      <section className="grid w-full min-w-0 grid-cols-1 gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.15fr)] lg:items-start">
+        <div className="min-w-0 w-full">
+          <EarthquakeList
+            earthquakes={recent.length > 0 ? recent : [latest]}
+          />
+        </div>
+
+        <div className="flex min-w-0 w-full flex-col gap-4">
+          <h2 className="text-2xl font-extrabold text-[#F7FAFC]">
+            Mapa de sismos recientes
+          </h2>
+
+          <div className="min-w-0 w-full overflow-hidden">
+            <MapShell earthquakes={earthquakes} height={550} />
+          </div>
         </div>
       </section>
 
