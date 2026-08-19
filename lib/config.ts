@@ -1,6 +1,7 @@
 export const SITE_NAME = "Pulso Sísmico";
 export const SITE_DESCRIPTION = "Actividad sísmica reciente en Chile.";
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+export const SITE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://pulsosismico.cl";
 
 export const COLORS = {
   background: "#07111F",
