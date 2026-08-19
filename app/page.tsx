@@ -88,7 +88,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <SourceAttribution />
+      {/* <SourceAttribution /> */}
       <LearnCardsSection />
     </main>
   );

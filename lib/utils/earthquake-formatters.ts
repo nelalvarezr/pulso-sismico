@@ -56,9 +56,9 @@ export function formatUpdatedAtLabel(updatedAt: string) {
 }
 
 export function buildEarthquakeTitle(earthquake: Earthquake) {
-  return `Sismo de magnitud ${earthquake.magnitude.toFixed(1)} cerca de ${earthquake.place} | Pulso Sísmico`;
+  return `Sismo de magnitud ${earthquake.magnitude.toFixed(1)} en ${earthquake.place} | Pulso Sísmico`;
 }
 
 export function buildEarthquakeDescription(earthquake: Earthquake) {
-  return `Sismo registrado cerca de ${earthquake.place}, Chile, con magnitud ${earthquake.magnitude.toFixed(1)} y profundidad de ${earthquake.depthKm} km.`;
+  return `Sismo de magnitud ${earthquake.magnitude.toFixed(1)} registrado en ${earthquake.place}, con una profundidad de ${earthquake.depthKm} km. Consulta hora, ubicación y mapa del evento en Chile.`;
 }

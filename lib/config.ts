@@ -1,5 +1,5 @@
 export const SITE_NAME = "Pulso Sísmico";
-export const SITE_DESCRIPTION = "Actividad sísmica reciente en Chile.";
+export const SITE_DESCRIPTION = "Consulta los últimos sismos registrados en Chile, con magnitud, profundidad, ubicación, hora y mapa de la actividad sísmica reciente.";
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://pulsosismico.cl";
 

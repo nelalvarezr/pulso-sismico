@@ -12,8 +12,10 @@ interface EarthquakeListItemProps {
 export function EarthquakeListItem({ earthquake }: EarthquakeListItemProps) {
   return (
     <li>
-      <Link
-        className="flex items-center gap-3 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-4 py-3 transition hover:border-[#55C2FF]/25 hover:bg-[#223B5D]"
+  <Link
+    className="flex items-center gap-3 rounded-[18px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] px-4 py-3 transition
+               hover:border-[#55C2FF]/25 hover:bg-[#223B5D]
+               active:border-[#55C2FF]/40 active:bg-[#274463] active:scale-[0.99]"
         href={`/sismo/${earthquake.id}`}
       >
         <MagnitudeBadge magnitude={earthquake.magnitude} size="xs" />
