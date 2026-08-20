@@ -15,9 +15,6 @@ export function Header({ updatedAt }: HeaderProps) {
         Pulso Sísmico muestra la actividad sísmica reciente de Chile con magnitud, profundidad, ubicación y mapa.
       </p>
 
-      {/* <p className="text-sm text-[#93A4B8]">
-        {formatUpdatedAtLabel(updatedAt)}
-      </p> */}
     </header>
   );
 }
