@@ -6,7 +6,7 @@ import { buildPageMetadata } from "@/lib/seo";
 
 export const metadata = buildPageMetadata({
   description:
-    "Fuentes de información utilizadas por Pulso Sísmico, incluyendo el CSN como referencia oficial y la API pública de Boostr como intermediario técnico.",
+    "Fuentes de información utilizadas por Pulso Sísmico, con el Centro Sismológico Nacional como referencia oficial y consulta directa de sus datos públicos.",
   path: "/fuentes",
   title: "Fuentes de información",
 });
@@ -14,7 +14,7 @@ export const metadata = buildPageMetadata({
 export default function SourcesPage() {
   return (
     <InfoPageShell
-      description="Pulso Sísmico toma como referencia principal al Centro Sismológico Nacional y usa la API pública de Boostr como capa técnica de consulta."
+      description="Pulso Sísmico utiliza como referencia principal al Centro Sismológico Nacional y consulta directamente sus datos públicos para construir el histórico y la actividad sísmica reciente."
       title="Fuentes de información"
     >
       <section className="grid gap-6 lg:grid-cols-2">
@@ -50,23 +50,19 @@ export default function SourcesPage() {
           </div>
 
           <p className="text-xs font-bold tracking-[0.18em] text-[#55C2FF]">
-            CAPA TÉCNICA
+            PROCESAMIENTO DE DATOS
           </p>
 
           <h2 className="mt-2 text-2xl font-extrabold text-[#F7FAFC]">
-            Intermediario técnico
+            Consulta y almacenamiento propio
           </h2>
 
           <p className="mt-3 text-sm leading-7 text-[#C4D0DF]">
-            Para consultar eventos recientes usamos la API pública de Boostr
-            como intermediario técnico. Esa capa permite recuperar datos
-            públicos de forma más directa desde el servidor del sitio.
+            Pulso Sísmico consulta directamente los catálogos públicos del Centro Sismológico Nacional para obtener los eventos sísmicos recientes y mantener un registro histórico propio.
           </p>
 
           <p className="mt-3 text-sm leading-7 text-[#C4D0DF]">
-            Pulso Sísmico no cambia los conceptos técnicos de magnitud,
-            profundidad, ubicación o fecha; solo los organiza visualmente y
-            agrega contexto editorial.
+            Los datos se organizan y almacenan para permitir su consulta histórica y su presentación en mapas, fichas y herramientas estadísticas, manteniendo siempre la referencia al informe oficial del CSN cuando está disponible.
           </p>
         </article>
       </section>
@@ -131,10 +127,7 @@ export default function SourcesPage() {
         </h2>
 
         <p className="mt-3 text-sm leading-7 text-[#C4D0DF]">
-          Pulso Sísmico es un proyecto independiente. No pertenece al Centro
-          Sismológico Nacional, SENAPRED ni a Boostr. Nuestro objetivo es
-          facilitar la lectura de información pública y mantener siempre
-          visibles las fuentes originales.
+          Pulso Sísmico es un proyecto independiente. No pertenece al Centro Sismológico Nacional ni a SENAPRED. Nuestro objetivo es facilitar la lectura de información pública, mantener un histórico consultable y conservar siempre visibles las fuentes oficiales.
         </p>
       </section>
     </InfoPageShell>
