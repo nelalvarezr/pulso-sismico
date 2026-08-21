@@ -8,7 +8,9 @@ export const EARTHQUAKE_REVALIDATE_SECONDS = 60;
 
 interface EarthquakeRow {
   id: string;
-  local_datetime: Date;
+  local_date: string;
+  local_time: string;
+  occurred_at: string;
   place: string;
   magnitude: string;
   depth_km: string | null;
@@ -25,36 +27,20 @@ export interface RecentEarthquakeFilters {
   limit?: number;
 }
 
-function formatDatePart(date: Date) {
-  return new Intl.DateTimeFormat("en-CA", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    timeZone: "America/Santiago",
-  }).format(date);
-}
-
-function formatHourPart(date: Date) {
-  return new Intl.DateTimeFormat("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: false,
-    timeZone: "America/Santiago",
-  }).format(date);
-}
-
 function rowToEarthquake(row: EarthquakeRow): Earthquake {
-  const localDate = new Date(row.local_datetime);
-
-  const date = formatDatePart(localDate);
-  const hour = formatHourPart(localDate);
-
   return {
     id: String(row.id),
-    occurredAt: `${date}T${hour}`,
-    date,
-    hour,
+
+    // UTC real del evento.
+    // Se usa para cálculos temporales como "hace X minutos".
+    occurredAt: row.occurred_at,
+
+    // Hora local publicada por el CSN.
+    // Se muestra exactamente como está almacenada,
+    // sin conversiones de zona horaria.
+    date: row.local_date,
+    hour: row.local_time,
+
     place: normalizePlaceDirection(row.place),
     magnitude: Number(row.magnitude),
     depthKm: Number(row.depth_km ?? 0),
@@ -68,21 +54,30 @@ function rowToEarthquake(row: EarthquakeRow): Earthquake {
 
 const RECENT_LIMIT = 16;
 
+const EARTHQUAKE_SELECT_FIELDS = `
+  id,
+  TO_CHAR(local_datetime, 'YYYY-MM-DD') AS local_date,
+  TO_CHAR(local_datetime, 'HH24:MI:SS') AS local_time,
+  TO_CHAR(
+    utc_datetime,
+    'YYYY-MM-DD"T"HH24:MI:SS'
+  ) || 'Z' AS occurred_at,
+  place,
+  magnitude,
+  depth_km,
+  latitude,
+  longitude,
+  felt,
+  report_url,
+  image_url
+`;
+
 const getCachedRecentEarthquakes = unstable_cache(
   async () => {
     const result = await postgresPool.query<EarthquakeRow>(
       `
         SELECT
-          id,
-          local_datetime,
-          place,
-          magnitude,
-          depth_km,
-          latitude,
-          longitude,
-          felt,
-          report_url,
-          image_url
+          ${EARTHQUAKE_SELECT_FIELDS}
         FROM earthquakes
         ORDER BY local_datetime DESC
         LIMIT $1
@@ -127,16 +122,7 @@ const getCachedFilteredRecentEarthquakes = unstable_cache(
     const result = await postgresPool.query<EarthquakeRow>(
       `
         SELECT
-          id,
-          local_datetime,
-          place,
-          magnitude,
-          depth_km,
-          latitude,
-          longitude,
-          felt,
-          report_url,
-          image_url
+          ${EARTHQUAKE_SELECT_FIELDS}
         FROM earthquakes
         ${whereClause}
         ORDER BY local_datetime DESC
@@ -163,39 +149,40 @@ export async function fetchFilteredRecentEarthquakes({
   feltOnly = false,
   limit = 15,
 }: RecentEarthquakeFilters = {}) {
-  const safeLimit = Math.min(Math.max(limit, 1), 50);
+  const safeLimit = Math.min(
+    Math.max(limit, 1),
+    50,
+  );
 
   return getCachedFilteredRecentEarthquakes(
-    typeof minMagnitude === "number" ? minMagnitude : null,
+    typeof minMagnitude === "number"
+      ? minMagnitude
+      : null,
     feltOnly,
     safeLimit,
   );
 }
 
-export async function fetchEarthquakeById(id: string) {
-  const result = await postgresPool.query<EarthquakeRow>(
-    `
-      SELECT
-        id,
-        local_datetime,
-        place,
-        magnitude,
-        depth_km,
-        latitude,
-        longitude,
-        felt,
-        report_url,
-        image_url
-      FROM earthquakes
-      WHERE id = $1
-      LIMIT 1
-    `,
-    [id],
-  );
+export async function fetchEarthquakeById(
+  id: string,
+) {
+  const result =
+    await postgresPool.query<EarthquakeRow>(
+      `
+        SELECT
+          ${EARTHQUAKE_SELECT_FIELDS}
+        FROM earthquakes
+        WHERE id = $1
+        LIMIT 1
+      `,
+      [id],
+    );
 
   const row = result.rows[0];
 
-  return row ? rowToEarthquake(row) : null;
+  return row
+    ? rowToEarthquake(row)
+    : null;
 }
 
 interface EarthquakeSitemapRow {
@@ -218,7 +205,9 @@ export async function fetchEarthquakeSitemapYears() {
       `,
     );
 
-  return result.rows.map((row) => row.year);
+  return result.rows.map(
+    (row) => row.year,
+  );
 }
 
 export async function fetchEarthquakesForSitemapByYear(
@@ -247,7 +236,6 @@ export async function fetchEarthquakesForSitemapByYear(
   }));
 }
 
-
 interface Earthquake24HourStatsRow {
   total: number;
   max_magnitude: string | null;
@@ -274,21 +262,37 @@ export async function fetchEarthquake24HourStats(): Promise<Earthquake24HourStat
             felt
           FROM earthquakes
           WHERE local_datetime >=
-            (CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago')
-            - INTERVAL '24 hours'
+            (
+              CURRENT_TIMESTAMP
+              AT TIME ZONE 'America/Santiago'
+            ) - INTERVAL '24 hours'
         ),
         highest AS (
           SELECT
             id,
             magnitude
           FROM recent
-          ORDER BY magnitude DESC, local_datetime DESC
+          ORDER BY
+            magnitude DESC,
+            local_datetime DESC
           LIMIT 1
         )
         SELECT
-          (SELECT COUNT(*)::int FROM recent) AS total,
-          (SELECT magnitude::text FROM highest) AS max_magnitude,
-          (SELECT id::text FROM highest) AS max_magnitude_id,
+          (
+            SELECT COUNT(*)::int
+            FROM recent
+          ) AS total,
+
+          (
+            SELECT magnitude::text
+            FROM highest
+          ) AS max_magnitude,
+
+          (
+            SELECT id::text
+            FROM highest
+          ) AS max_magnitude_id,
+
           (
             SELECT COUNT(*)::int
             FROM recent
@@ -301,16 +305,20 @@ export async function fetchEarthquake24HourStats(): Promise<Earthquake24HourStat
 
   return {
     total: row?.total ?? 0,
+
     maxMagnitude:
       row?.max_magnitude !== null &&
       row?.max_magnitude !== undefined
         ? Number(row.max_magnitude)
         : null,
-    maxMagnitudeId: row?.max_magnitude_id ?? null,
-    feltCount: row?.felt_count ?? 0,
+
+    maxMagnitudeId:
+      row?.max_magnitude_id ?? null,
+
+    feltCount:
+      row?.felt_count ?? 0,
   };
 }
-
 
 interface EarthquakeHourlyActivityRow {
   bucket: number;
@@ -332,13 +340,22 @@ export async function fetchEarthquakeHourlyActivity(): Promise<
       `
         WITH params AS (
           SELECT
-            CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago' AS end_time,
-            (CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago')
-              - INTERVAL '24 hours' AS start_time
+            CURRENT_TIMESTAMP
+              AT TIME ZONE 'America/Santiago'
+              AS end_time,
+
+            (
+              CURRENT_TIMESTAMP
+              AT TIME ZONE 'America/Santiago'
+            ) - INTERVAL '24 hours'
+              AS start_time
         ),
+
         buckets AS (
-          SELECT generate_series(0, 23) AS bucket
+          SELECT
+            GENERATE_SERIES(0, 23) AS bucket
         ),
+
         counts AS (
           SELECT
             LEAST(
@@ -346,29 +363,53 @@ export async function fetchEarthquakeHourlyActivity(): Promise<
               FLOOR(
                 EXTRACT(
                   EPOCH FROM (
-                    e.local_datetime - p.start_time
+                    e.local_datetime
+                    - p.start_time
                   )
                 ) / 3600
               )::int
             ) AS bucket,
+
             COUNT(*)::int AS total
+
           FROM earthquakes e
+
           CROSS JOIN params p
-          WHERE e.local_datetime >= p.start_time
-            AND e.local_datetime <= p.end_time
+
+          WHERE
+            e.local_datetime >=
+              p.start_time
+
+            AND e.local_datetime <=
+              p.end_time
+
           GROUP BY 1
         )
+
         SELECT
           b.bucket,
+
           TO_CHAR(
-            p.start_time + (b.bucket * INTERVAL '1 hour'),
+            p.start_time
+              + (
+                  b.bucket
+                  * INTERVAL '1 hour'
+                ),
             'HH24:MI'
           ) AS label,
-          COALESCE(c.total, 0)::int AS total
+
+          COALESCE(
+            c.total,
+            0
+          )::int AS total
+
         FROM buckets b
+
         CROSS JOIN params p
+
         LEFT JOIN counts c
           ON c.bucket = b.bucket
+
         ORDER BY b.bucket ASC
       `,
     );

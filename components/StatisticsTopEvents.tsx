@@ -12,24 +12,32 @@ interface StatisticsTopEventsProps {
   period: StatisticsPeriod;
 }
 
-function formatEventDate(date: Date) {
-  return new Intl.DateTimeFormat("es-CL", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "America/Santiago",
-  })
-    .format(date)
-    .replace(".", "");
-}
+const SPANISH_MONTHS_SHORT = [
+  "ene",
+  "feb",
+  "mar",
+  "abr",
+  "may",
+  "jun",
+  "jul",
+  "ago",
+  "sept",
+  "oct",
+  "nov",
+  "dic",
+];
 
-function formatEventTime(date: Date) {
-  return new Intl.DateTimeFormat("es-CL", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "America/Santiago",
-  }).format(date);
+function formatEventDate(date: string) {
+  const [year, month, day] =
+    date.split("-").map(Number);
+
+  const monthLabel =
+    SPANISH_MONTHS_SHORT[month - 1] ?? "";
+
+  return `${String(day).padStart(
+    2,
+    "0",
+  )} ${monthLabel} ${year}`;
 }
 
 function buildEventHref(
@@ -78,10 +86,16 @@ export function StatisticsTopEvents({
                   1,
                 )} en ${event.place}`}
                 className="group flex items-center gap-3 rounded-[20px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-4 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-[#55C2FF]/30 hover:bg-[#223B5D] active:translate-y-0 active:scale-[0.99] active:border-[#55C2FF]/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#55C2FF]/60 md:gap-4"
-                href={buildEventHref(event.id, period)}
+                href={buildEventHref(
+                  event.id,
+                  period,
+                )}
               >
                 <span className="hidden w-7 shrink-0 text-center text-xs font-extrabold text-[#60748D] sm:block">
-                  {String(index + 1).padStart(2, "0")}
+                  {String(index + 1).padStart(
+                    2,
+                    "0",
+                  )}
                 </span>
 
                 <MagnitudeBadge
@@ -101,6 +115,7 @@ export function StatisticsTopEvents({
                           aria-hidden="true"
                           className="h-1.5 w-1.5 rounded-full bg-[#55C2FF]"
                         />
+
                         PERCIBIDO
                       </span>
                     )}
@@ -108,15 +123,20 @@ export function StatisticsTopEvents({
 
                   <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#93A4B8]">
                     <span>
-                      {formatEventDate(event.occurredAt)}
+                      {formatEventDate(
+                        event.date,
+                      )}
                       {" · "}
-                      {formatEventTime(event.occurredAt)}
+                      {event.hour.slice(0, 5)}
                     </span>
 
                     {event.depthKm !== null && (
                       <span>
                         Profundidad{" "}
-                        {event.depthKm.toLocaleString("es-CL")} km
+                        {event.depthKm.toLocaleString(
+                          "es-CL",
+                        )}{" "}
+                        km
                       </span>
                     )}
                   </div>

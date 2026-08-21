@@ -64,15 +64,19 @@ function getPeriodWhereClause(
     case "7d":
       return `
         WHERE local_datetime >=
-          (CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago')
-          - INTERVAL '7 days'
+          (
+            CURRENT_TIMESTAMP
+            AT TIME ZONE 'America/Santiago'
+          ) - INTERVAL '7 days'
       `;
 
     case "1y":
       return `
         WHERE local_datetime >=
-          (CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago')
-          - INTERVAL '1 year'
+          (
+            CURRENT_TIMESTAMP
+            AT TIME ZONE 'America/Santiago'
+          ) - INTERVAL '1 year'
       `;
 
     case "historico":
@@ -82,8 +86,10 @@ function getPeriodWhereClause(
     default:
       return `
         WHERE local_datetime >=
-          (CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago')
-          - INTERVAL '30 days'
+          (
+            CURRENT_TIMESTAMP
+            AT TIME ZONE 'America/Santiago'
+          ) - INTERVAL '30 days'
       `;
   }
 }
@@ -91,7 +97,8 @@ function getPeriodWhereClause(
 export async function fetchStatisticsSummary(
   period: StatisticsPeriod,
 ): Promise<StatisticsSummary> {
-  const whereClause = getPeriodWhereClause(period);
+  const whereClause =
+    getPeriodWhereClause(period);
 
   const result =
     await postgresPool.query<StatisticsSummaryRow>(
@@ -111,7 +118,9 @@ export async function fetchStatisticsSummary(
             id,
             magnitude
           FROM filtered
-          ORDER BY magnitude DESC, local_datetime DESC
+          ORDER BY
+            magnitude DESC,
+            local_datetime DESC
           LIMIT 1
         )
         SELECT
@@ -138,7 +147,10 @@ export async function fetchStatisticsSummary(
 
           (
             SELECT
-              ROUND(AVG(depth_km)::numeric, 1)::text
+              ROUND(
+                AVG(depth_km)::numeric,
+                1
+              )::text
             FROM filtered
             WHERE depth_km IS NOT NULL
           ) AS average_depth
@@ -170,9 +182,13 @@ export async function fetchStatisticsSummary(
   };
 }
 
+/* ============================================================
+   ACTIVIDAD EN EL TIEMPO
+   ============================================================ */
+
 interface StatisticsActivityRow {
   bucket_index: number;
-  bucket_start: Date;
+  bucket_date: string;
   total: number;
 }
 
@@ -182,24 +198,39 @@ export interface StatisticsActivityPoint {
   total: number;
 }
 
+const SPANISH_MONTHS_SHORT = [
+  "ene",
+  "feb",
+  "mar",
+  "abr",
+  "may",
+  "jun",
+  "jul",
+  "ago",
+  "sept",
+  "oct",
+  "nov",
+  "dic",
+];
+
 function formatActivityLabel(
-  date: Date,
+  date: string,
   period: StatisticsPeriod,
 ) {
+  const [year, month, day] =
+    date.split("-").map(Number);
+
   if (period === "historico") {
-    return new Intl.DateTimeFormat("es-CL", {
-      year: "numeric",
-      timeZone: "America/Santiago",
-    }).format(date);
+    return String(year);
   }
 
-  return new Intl.DateTimeFormat("es-CL", {
-    day: "2-digit",
-    month: "short",
-    timeZone: "America/Santiago",
-  })
-    .format(date)
-    .replace(".", "");
+  const monthLabel =
+    SPANISH_MONTHS_SHORT[month - 1] ?? "";
+
+  return `${String(day).padStart(
+    2,
+    "0",
+  )} ${monthLabel}`;
 }
 
 async function fetchHistoricalActivity(): Promise<
@@ -210,43 +241,74 @@ async function fetchHistoricalActivity(): Promise<
       `
         WITH bounds AS (
           SELECT
-            DATE_TRUNC('year', MIN(local_datetime)) AS start_time,
-            DATE_TRUNC('year', MAX(local_datetime)) AS end_time
+            DATE_TRUNC(
+              'year',
+              MIN(local_datetime)
+            ) AS start_time,
+
+            DATE_TRUNC(
+              'year',
+              MAX(local_datetime)
+            ) AS end_time
+
           FROM earthquakes
         ),
+
         buckets AS (
           SELECT
-            ROW_NUMBER() OVER (ORDER BY bucket_start) - 1 AS bucket_index,
+            ROW_NUMBER()
+              OVER (
+                ORDER BY bucket_start
+              ) - 1 AS bucket_index,
+
             bucket_start
+
           FROM bounds
+
           CROSS JOIN LATERAL GENERATE_SERIES(
             start_time,
             end_time,
             INTERVAL '1 year'
           ) AS bucket_start
         )
+
         SELECT
           b.bucket_index::int,
-          b.bucket_start,
+
+          TO_CHAR(
+            b.bucket_start,
+            'YYYY-MM-DD'
+          ) AS bucket_date,
+
           COUNT(e.id)::int AS total
+
         FROM buckets b
+
         LEFT JOIN earthquakes e
-          ON e.local_datetime >= b.bucket_start
+          ON e.local_datetime >=
+            b.bucket_start
+
           AND e.local_datetime <
-            b.bucket_start + INTERVAL '1 year'
+            b.bucket_start
+              + INTERVAL '1 year'
+
         GROUP BY
           b.bucket_index,
           b.bucket_start
-        ORDER BY b.bucket_start ASC
+
+        ORDER BY
+          b.bucket_start ASC
       `,
     );
 
   return result.rows.map((row) => ({
     index: row.bucket_index,
+
     label: formatActivityLabel(
-      row.bucket_start,
+      row.bucket_date,
       "historico",
     ),
+
     total: row.total,
   }));
 }
@@ -262,19 +324,25 @@ export async function fetchStatisticsActivity(
     period === "7d"
       ? {
           bucketCount: 7,
-          bucketInterval: "INTERVAL '1 day'",
-          startInterval: "INTERVAL '7 days'",
+          bucketInterval:
+            "INTERVAL '1 day'",
+          startInterval:
+            "INTERVAL '7 days'",
         }
       : period === "30d"
         ? {
             bucketCount: 30,
-            bucketInterval: "INTERVAL '1 day'",
-            startInterval: "INTERVAL '30 days'",
+            bucketInterval:
+              "INTERVAL '1 day'",
+            startInterval:
+              "INTERVAL '30 days'",
           }
         : {
             bucketCount: 53,
-            bucketInterval: "INTERVAL '7 days'",
-            startInterval: "INTERVAL '1 year'",
+            bucketInterval:
+              "INTERVAL '7 days'",
+            startInterval:
+              "INTERVAL '1 year'",
           };
 
   const result =
@@ -282,61 +350,89 @@ export async function fetchStatisticsActivity(
       `
         WITH params AS (
           SELECT
-            CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago'
+            CURRENT_TIMESTAMP
+              AT TIME ZONE 'America/Santiago'
               AS end_time,
+
             (
-              CURRENT_TIMESTAMP AT TIME ZONE 'America/Santiago'
+              CURRENT_TIMESTAMP
+              AT TIME ZONE 'America/Santiago'
             ) - ${config.startInterval}
               AS start_time
         ),
+
         buckets AS (
           SELECT
             bucket_index,
+
             p.start_time
               + (
                   bucket_index
                   * ${config.bucketInterval}
                 ) AS bucket_start,
+
             p.start_time
               + (
                   (bucket_index + 1)
                   * ${config.bucketInterval}
                 ) AS bucket_end
+
           FROM params p
+
           CROSS JOIN GENERATE_SERIES(
             0,
             ${config.bucketCount - 1}
           ) AS bucket_index
         )
+
         SELECT
           b.bucket_index::int,
-          b.bucket_start,
+
+          TO_CHAR(
+            b.bucket_start,
+            'YYYY-MM-DD'
+          ) AS bucket_date,
+
           COUNT(e.id)::int AS total
+
         FROM buckets b
+
         CROSS JOIN params p
+
         LEFT JOIN earthquakes e
-          ON e.local_datetime >= b.bucket_start
+          ON e.local_datetime >=
+            b.bucket_start
+
           AND e.local_datetime <
             LEAST(
               b.bucket_end,
               p.end_time
             )
+
         GROUP BY
           b.bucket_index,
           b.bucket_start
-        ORDER BY b.bucket_index ASC
+
+        ORDER BY
+          b.bucket_index ASC
       `,
     );
 
   return result.rows.map((row) => ({
     index: row.bucket_index,
+
     label: formatActivityLabel(
-      row.bucket_start,
+      row.bucket_date,
       period,
     ),
+
     total: row.total,
   }));
 }
+
+/* ============================================================
+   DISTRIBUCIONES
+   ============================================================ */
 
 interface StatisticsDistributionsRow {
   magnitude_total: number;
@@ -377,7 +473,8 @@ function calculatePercentage(
 export async function fetchStatisticsDistributions(
   period: StatisticsPeriod,
 ): Promise<StatisticsDistributionsData> {
-  const whereClause = getPeriodWhereClause(period);
+  const whereClause =
+    getPeriodWhereClause(period);
 
   const result =
     await postgresPool.query<StatisticsDistributionsRow>(
@@ -389,6 +486,7 @@ export async function fetchStatisticsDistributions(
           FROM earthquakes
           ${whereClause}
         )
+
         SELECT
           COUNT(*) FILTER (
             WHERE magnitude IS NOT NULL
@@ -450,65 +548,82 @@ export async function fetchStatisticsDistributions(
   const magnitudeCounts = [
     {
       label: "Menor a 3,0",
-      count: row?.magnitude_lt_3 ?? 0,
+      count:
+        row?.magnitude_lt_3 ?? 0,
     },
     {
       label: "3,0 – 3,9",
-      count: row?.magnitude_3_4 ?? 0,
+      count:
+        row?.magnitude_3_4 ?? 0,
     },
     {
       label: "4,0 – 4,9",
-      count: row?.magnitude_4_5 ?? 0,
+      count:
+        row?.magnitude_4_5 ?? 0,
     },
     {
       label: "5,0 o más",
-      count: row?.magnitude_5_plus ?? 0,
+      count:
+        row?.magnitude_5_plus ?? 0,
     },
   ];
 
   const depthCounts = [
     {
       label: "0 – 29 km",
-      count: row?.depth_0_30 ?? 0,
+      count:
+        row?.depth_0_30 ?? 0,
     },
     {
       label: "30 – 69 km",
-      count: row?.depth_30_70 ?? 0,
+      count:
+        row?.depth_30_70 ?? 0,
     },
     {
       label: "70 – 149 km",
-      count: row?.depth_70_150 ?? 0,
+      count:
+        row?.depth_70_150 ?? 0,
     },
     {
       label: "150 km o más",
-      count: row?.depth_150_plus ?? 0,
+      count:
+        row?.depth_150_plus ?? 0,
     },
   ];
 
   return {
-    magnitude: magnitudeCounts.map(
-      (item) => ({
+    magnitude:
+      magnitudeCounts.map((item) => ({
         ...item,
-        percentage: calculatePercentage(
-          item.count,
-          magnitudeTotal,
-        ),
-      }),
-    ),
 
-    depth: depthCounts.map((item) => ({
-      ...item,
-      percentage: calculatePercentage(
-        item.count,
-        depthTotal,
-      ),
-    })),
+        percentage:
+          calculatePercentage(
+            item.count,
+            magnitudeTotal,
+          ),
+      })),
+
+    depth:
+      depthCounts.map((item) => ({
+        ...item,
+
+        percentage:
+          calculatePercentage(
+            item.count,
+            depthTotal,
+          ),
+      })),
   };
 }
 
+/* ============================================================
+   EVENTOS DESTACADOS
+   ============================================================ */
+
 interface StatisticsTopEventRow {
   id: string;
-  local_datetime: Date;
+  local_date: string;
+  local_time: string;
   place: string;
   magnitude: string;
   depth_km: string | null;
@@ -517,7 +632,13 @@ interface StatisticsTopEventRow {
 
 export interface StatisticsTopEvent {
   id: string;
-  occurredAt: Date;
+
+  // Hora local del CSN.
+  // Se muestra literalmente y nunca se
+  // convierte de zona horaria.
+  date: string;
+  hour: string;
+
   place: string;
   magnitude: number;
   depthKm: number | null;
@@ -528,7 +649,8 @@ export async function fetchStatisticsTopEvents(
   period: StatisticsPeriod,
   limit = 5,
 ): Promise<StatisticsTopEvent[]> {
-  const whereClause = getPeriodWhereClause(period);
+  const whereClause =
+    getPeriodWhereClause(period);
 
   const safeLimit = Math.min(
     Math.max(limit, 1),
@@ -540,16 +662,30 @@ export async function fetchStatisticsTopEvents(
       `
         SELECT
           id,
-          local_datetime,
+
+          TO_CHAR(
+            local_datetime,
+            'YYYY-MM-DD'
+          ) AS local_date,
+
+          TO_CHAR(
+            local_datetime,
+            'HH24:MI:SS'
+          ) AS local_time,
+
           place,
           magnitude,
           depth_km,
           felt
+
         FROM earthquakes
+
         ${whereClause}
+
         ORDER BY
           magnitude DESC,
           local_datetime DESC
+
         LIMIT $1
       `,
       [safeLimit],
@@ -557,13 +693,24 @@ export async function fetchStatisticsTopEvents(
 
   return result.rows.map((row) => ({
     id: String(row.id),
-    occurredAt: row.local_datetime,
-    place: normalizePlaceDirection(row.place),
-    magnitude: Number(row.magnitude),
+
+    date: row.local_date,
+    hour: row.local_time,
+
+    place:
+      normalizePlaceDirection(
+        row.place,
+      ),
+
+    magnitude:
+      Number(row.magnitude),
+
     depthKm:
       row.depth_km !== null
         ? Number(row.depth_km)
         : null,
-    felt: row.felt === true,
+
+    felt:
+      row.felt === true,
   }));
 }
