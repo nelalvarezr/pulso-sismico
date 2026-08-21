@@ -57,6 +57,7 @@ export function normalizeEarthquake(item: EarthquakeApiItem): Earthquake | null 
     depthKm,
     latitude,
     longitude,
+    felt: false,
     imageUrl,
     reportUrl,
   };

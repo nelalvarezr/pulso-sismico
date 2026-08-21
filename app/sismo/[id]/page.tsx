@@ -18,6 +18,45 @@ export const revalidate = 60;
 
 interface DetailPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{
+    volver?: string | string[];
+  }>;
+}
+
+function getFirstSearchParam(
+  value: string | string[] | undefined,
+) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getReturnUrl(
+  value: string | undefined,
+) {
+  if (!value) {
+    return "/";
+  }
+
+  if (value === "/estadisticas") {
+    return value;
+  }
+
+  if (value.startsWith("/estadisticas?")) {
+    const query = value.split("?")[1];
+    const params = new URLSearchParams(query);
+
+    const period = params.get("periodo");
+
+    if (
+      period === "7d" ||
+      period === "30d" ||
+      period === "1y" ||
+      period === "historico"
+    ) {
+      return `/estadisticas?periodo=${period}`;
+    }
+  }
+
+  return "/";
 }
 
 export async function generateMetadata({ params }: DetailPageProps): Promise<Metadata> {
@@ -57,8 +96,17 @@ export async function generateMetadata({ params }: DetailPageProps): Promise<Met
   };
 }
 
-export default async function EarthquakeDetailPage({ params }: DetailPageProps) {
+export default async function EarthquakeDetailPage({
+  params,
+  searchParams,
+}: DetailPageProps) {
   const { id } = await params;
+  const query = await searchParams;
+
+  const returnUrl = getReturnUrl(
+    getFirstSearchParam(query.volver),
+  );
+
   const earthquake = await fetchEarthquakeById(id);
 
   if (!earthquake) notFound();
@@ -82,11 +130,15 @@ export default async function EarthquakeDetailPage({ params }: DetailPageProps) 
       <script dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} type="application/ld+json" />
 
       <Link
-        className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#55C2FF]/25 bg-[#55C2FF]/8 px-3.5 py-1 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/15"
-        href="/"
+        className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#55C2FF]/25 bg-[#55C2FF]/8 px-3.5 py-1 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/15 active:scale-[0.98]"
+        href={returnUrl}
       >
-        <span>←</span>
-        <span>Volver</span>
+        <span aria-hidden="true">←</span>
+        <span>
+          {returnUrl.startsWith("/estadisticas")
+            ? "Volver a estadísticas"
+            : "Volver"}
+        </span>
       </Link>
 
       <article className="rounded-[28px] border border-[var(--border-subtle)] bg-[var(--surface)] p-6 shadow-[0_24px_60px_rgba(0,0,0,0.30)]">

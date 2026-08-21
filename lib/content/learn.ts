@@ -1,5 +1,6 @@
 export const footerLinks = [
   { href: "/acerca-de", label: "Acerca de" },
+  { href: "/estadisticas", label: "Estadísticas" },
   { href: "/fuentes", label: "Fuentes" },
   { href: "/aprende/magnitud", label: "Magnitud" },
   { href: "/aprende/profundidad", label: "Profundidad" },
@@ -44,6 +45,7 @@ export const homeLearnCards = [
 
 export const staticSiteRoutes = [
   "/",
+  "/estadisticas",
   "/acerca-de",
   "/fuentes",
   "/aprende/magnitud",

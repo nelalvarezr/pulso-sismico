@@ -5,6 +5,7 @@ export interface EarthquakeApiItem {
   magnitude: string;
   depth: string;
   latitude: string;
+  felt: boolean;
   longitude: string;
   image?: string;
   info?: string;
@@ -30,6 +31,7 @@ export interface Earthquake {
   depthKm: number;
   latitude: number;
   longitude: number;
+  felt: boolean;
   imageUrl: string;
   reportUrl: string;
 }

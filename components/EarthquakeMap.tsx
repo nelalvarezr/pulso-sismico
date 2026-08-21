@@ -48,7 +48,13 @@ function FitBounds({
   const map = useMapHook();
 
   useEffect(() => {
-    if (earthquakes.length === 0) return;
+    if (earthquakes.length === 0) {
+      map.setView(
+        [CHILE_MAP_CENTER.lat, CHILE_MAP_CENTER.lng],
+        CHILE_MAP_CENTER.zoom,
+      );
+      return;
+    }
 
     const focused = focusId
       ? earthquakes.find((item) => item.id === focusId)
@@ -57,16 +63,28 @@ function FitBounds({
     if (focused) {
       map.setView(
         [focused.latitude, focused.longitude],
-        focusZoom
+        focusZoom,
+      );
+      return;
+    }
+
+    if (earthquakes.length === 1) {
+      const earthquake = earthquakes[0];
+
+      map.setView(
+        [earthquake.latitude, earthquake.longitude],
+        7,
       );
       return;
     }
 
     const bounds = earthquakes.map(
-      (item) => [item.latitude, item.longitude]
+      (item) => [item.latitude, item.longitude],
     ) as [number, number][];
 
-    map.fitBounds(bounds, { padding: [32, 32] });
+    map.fitBounds(bounds, {
+      padding: [32, 32],
+    });
   }, [earthquakes, focusId, focusZoom, map]);
 
   return null;
