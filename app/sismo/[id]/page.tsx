@@ -178,7 +178,8 @@ export default async function EarthquakeDetailPage({
             height={360}
             interactive={false}
             focusZoom={6}
-            showPopup={false} />
+            showPopup={false}
+            showDetailLink={false} />
         </div>
 
         <section className="overflow-hidden rounded-[28px] border border-[var(--border-subtle)] bg-[var(--surface)] shadow-[0_24px_60px_rgba(0,0,0,0.24)]">

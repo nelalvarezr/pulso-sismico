@@ -18,6 +18,7 @@ interface MapShellProps {
   focusEarthquakeId?: string;
   height?: number;
   interactive?: boolean;
+  showDetailLink?: boolean;
   focusZoom?: number;
   showPopup?: boolean;
 }
