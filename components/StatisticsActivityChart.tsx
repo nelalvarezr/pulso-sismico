@@ -140,7 +140,7 @@ export function StatisticsActivityChart({
 
             <div className="mt-1 flex items-baseline gap-1.5">
               <span className="text-xl font-extrabold text-[#F7FAFC]">
-                {maxActivity.total}
+                {maxActivity.total.toLocaleString("es-CL")}
               </span>
 
               <span className="text-xs text-[#93A4B8]">

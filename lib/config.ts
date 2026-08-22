@@ -1,7 +1,7 @@
 export const SITE_NAME = "Pulso Sísmico";
 export const SITE_DESCRIPTION = "Consulta los últimos sismos registrados en Chile, con magnitud, profundidad, ubicación, hora y mapa de la actividad sísmica reciente.";
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://pulsosismico.cl";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://pulsosismico.cl";
+export const HISTORICAL_START_YEAR = 2000;
 
 export const COLORS = {
   background: "#07111F",
