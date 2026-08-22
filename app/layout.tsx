@@ -4,7 +4,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 
 import { SiteFooter } from "@/components/SiteFooter";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/config";
-
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 const siteFont = Plus_Jakarta_Sans({
@@ -46,6 +46,7 @@ export default function RootLayout({
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const gaId = process.env.NEXT_PUBLIC_GA_ID;
   return (
     <html
       lang="es"
@@ -58,6 +59,9 @@ export default function RootLayout({
         {children}
         <SiteFooter />
       </body>
+      {gaId ? (
+        <GoogleAnalytics gaId={gaId} />
+      ) : null}
     </html>
   );
 }
