@@ -1,9 +1,10 @@
 import { InfoPageShell } from "@/components/InfoPageShell";
 import { buildPageMetadata } from "@/lib/seo";
+import Link from "next/link";
 
 export const metadata = buildPageMetadata({
   description:
-    "Qué es Pulso Sísmico, cómo presenta la actividad sísmica reciente en Chile y cuál es el alcance editorial del sitio.",
+    "Qué es Pulso Sísmico, cómo presenta la actividad sísmica reciente e histórica de Chile, sus estadísticas y cuál es el alcance editorial del sitio.",
   path: "/acerca-de",
   title: "Acerca de Pulso Sísmico",
 });
@@ -14,7 +15,7 @@ export default function AboutPage() {
       eyebrow: "INFORMACIÓN",
       icon: "🌎",
       title: "Qué es",
-      body: "Mostramos actividad sísmica reciente en Chile a partir de datos publicados por fuentes conocidas del ecosistema sismológico nacional.",
+      body: "Mostramos actividad sísmica reciente e histórica de Chile, organizando datos públicos para facilitar su consulta, visualización y análisis.",
     },
     {
       eyebrow: "ALCANCE",
@@ -32,7 +33,7 @@ export default function AboutPage() {
 
   return (
     <InfoPageShell
-      description="Pulso Sísmico organiza información reciente sobre sismos en Chile para que pueda leerse rápido, con contexto y sin ruido innecesario."
+      description="Pulso Sísmico organiza información sísmica reciente e histórica de Chile para facilitar su consulta, exploración y comprensión, con contexto y sin ruido innecesario."
       title="Acerca de Pulso Sísmico"
     >
       <section className="grid gap-6 lg:grid-cols-3">
@@ -69,7 +70,7 @@ export default function AboutPage() {
           Cómo leer el sitio
         </h2>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2">
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
           <article className="rounded-[22px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-5">
             <span className="text-xs font-extrabold tracking-[0.16em] text-[#55C2FF]">
               01
@@ -80,14 +81,38 @@ export default function AboutPage() {
             </h3>
 
             <p className="mt-2 text-sm leading-7 text-[#C4D0DF]">
-              La portada reúne el último sismo, una lista reciente y un mapa para
-              obtener una visión rápida del momento sísmico actual.
+              La portada reúne el último sismo, los eventos recientes y un mapa para
+              obtener una visión rápida de la actividad sísmica actual.
             </p>
           </article>
 
           <article className="rounded-[22px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-5">
             <span className="text-xs font-extrabold tracking-[0.16em] text-[#55C2FF]">
               02
+            </span>
+
+            <h3 className="mt-2 text-lg font-bold text-[#F7FAFC]">
+              Estadísticas e historia
+            </h3>
+
+            <p className="mt-2 text-sm leading-7 text-[#C4D0DF]">
+              La sección Estadísticas permite explorar la actividad sísmica por
+              períodos, comparar magnitudes y profundidades, identificar eventos
+              percibidos y revisar los sismos más destacados.
+            </p>
+
+            <Link
+              className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-[#55C2FF] transition hover:text-[#8ED8FF]"
+              href="/estadisticas"
+            >
+              Explorar estadísticas
+              <span aria-hidden="true">→</span>
+            </Link>
+          </article>
+
+          <article className="rounded-[22px] border border-[var(--border-subtle)] bg-[var(--surface-elevated)] p-5">
+            <span className="text-xs font-extrabold tracking-[0.16em] text-[#55C2FF]">
+              03
             </span>
 
             <h3 className="mt-2 text-lg font-bold text-[#F7FAFC]">

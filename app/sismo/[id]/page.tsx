@@ -130,11 +130,16 @@ export default async function EarthquakeDetailPage({
       <script dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} type="application/ld+json" />
 
       <Link
-        className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#55C2FF]/25 bg-[#55C2FF]/8 px-3.5 py-1 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/15 active:scale-[0.98]"
+        className="inline-flex w-fit items-center gap-1.5 rounded-full border border-[#55C2FF]/25 bg-[#55C2FF]/8 px-3.5 py-1.5 text-sm font-semibold text-[#55C2FF] transition hover:bg-[#55C2FF]/15 active:scale-[0.98]"
         href={returnUrl}
       >
-        <span aria-hidden="true">←</span>
-        <span>
+        <span
+          aria-hidden="true"
+          className="flex h-4 items-center text-base leading-none"
+        >
+         ←
+        </span>
+        <span className="leading-none">
           {returnUrl.startsWith("/estadisticas")
             ? "Volver a estadísticas"
             : "Volver"}
