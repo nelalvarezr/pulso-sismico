@@ -176,7 +176,7 @@ export default async function EarthquakeDetailPage({
             earthquakes={[earthquake]}
             focusEarthquakeId={earthquake.id}
             height={360}
-            interactive={true}
+            interactive={false}
             focusZoom={6}
             showPopup={false} />
         </div>
